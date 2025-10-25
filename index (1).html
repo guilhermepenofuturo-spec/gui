@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeria de Imagens</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .galeria-container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 1300px;
+      width: 95%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333333;
+      font-size: 2em;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      color: #777;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .descricao {
+      font-size: 0.95em;
+      color: #555;
+      background-color: #f9f9f9;
+      border-left: 4px solid #0078d7;
+      border-radius: 8px;
+      padding: 10px 15px;
+      display: inline-block;
+      margin-bottom: 30px;
+      text-align: left;
+      max-width: 600px;
+    }
+
+    .descricao strong {
+      color: #0078d7;
+    }
+
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      justify-items: center;
+    }
+
+    .item {
+      width: 100%;
+      max-width: 280px;
+      background-color: #fafafa;
+      border: 2px dashed #ccc;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .item:hover {
+      border-color: #0078d7;
+      box-shadow: 0 0 10px rgba(0, 120, 215, 0.2);
+    }
+
+    .item img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background-color: #eaeaea;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 45px;
+      padding: 8px 10px;
+      font-size: 0.9em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      resize: none;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+      margin-bottom: 8px;
+    }
+
+    textarea:focus {
+      border-color: #0078d7;
+    }
+
+    .upload-btn {
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .upload-btn:hover {
+      background-color: #005fa3;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      .galeria {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .galeria {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .galeria {
+        grid-template-columns: 1fr;
+      }
+
+      .descricao {
+        text-align: center;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="galeria-container">
+    <h1>Galeria de Imagens</h1>
+    <h2>Tudo que faz parte do meu mundo pessoal</h2>
+
+    <div class="descricao">
+      📸 Você pode:
+      <ul style="margin: 8px 0 0 20px; padding: 0; text-align: left;">
+        <li>Copiar uma imagem da internet e <strong>colar diretamente</strong> no campo abaixo;</li>
+        <li>Ou colar o <strong>link da imagem</strong> (ex: https://...);</li>
+        <li>Ou clicar em <strong>“Escolher imagem”</strong> para enviar uma foto do seu computador.</li>
+      </ul>
+    </div>
+
+    <div class="galeria"></div>
+  </div>
+
+  <script>
+    const galeria = document.querySelector('.galeria');
+
+    // Gera dinamicamente os blocos da galeria
+    galeria.innerHTML = Array.from({length: 16}, (_, i) => `
+      <div class="item">
+        <img id="img${i+1}" src="" alt="Imagem ${i+1}">
+        <textarea id="link${i+1}" placeholder="Cole o link ou imagem ${i+1}..."></textarea>
+        <button class="upload-btn" id="btn${i+1}">Escolher imagem</button>
+        <input type="file" id="file${i+1}" accept="image/*">
+      </div>
+    `).join('');
+
+    // Função para salvar imagem (URL ou base64)
+    function salvarImagem(i, valor) {
+      localStorage.setItem(`imgLink${i}`, valor);
+    }
+
+    // Função para carregar imagens salvas
+    function carregarImagens() {
+      for (let i = 1; i <= 16; i++) {
+        const img = document.getElementById(`img${i}`);
+        const textarea = document.getElementById(`link${i}`);
+        const fileInput = document.getElementById(`file${i}`);
+        const uploadBtn = document.getElementById(`btn${i}`);
+        const saved = localStorage.getItem(`imgLink${i}`);
+
+        if (saved) {
+          img.src = saved;
+          textarea.value = saved;
+        }
+
+        // Quando o usuário digita ou cola um link
+        textarea.addEventListener('input', () => {
+          const url = textarea.value.trim();
+          if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) {
+            img.src = url;
+            salvarImagem(i, url);
+          } else if (url === '') {
+            img.src = '';
+            localStorage.removeItem(`imgLink${i}`);
+          }
+        });
+
+        // Quando o usuário cola uma imagem diretamente
+        textarea.addEventListener('paste', (event) => {
+          const items = event.clipboardData.items;
+          for (const item of items) {
+            if (item.type.startsWith('image/')) {
+              const file = item.getAsFile();
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                const base64 = e.target.result;
+                img.src = base64;
+                textarea.value = base64;
+                salvarImagem(i, base64);
+              };
+              reader.readAsDataURL(file);
+              event.preventDefault();
+              return;
+            }
+          }
+        });
+
+        // Quando o usuário clica no botão "Escolher imagem"
+        uploadBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        // Quando o usuário escolhe uma imagem do computador
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const base64 = e.target.result;
+              img.src = base64;
+              textarea.value = base64;
+              salvarImagem(i, base64);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', carregarImagens);
+  </script>
+</body>
+</html>
+
